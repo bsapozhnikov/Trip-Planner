@@ -1,8 +1,22 @@
 from flask import Flask,request,redirect,render_template,session,flash
-import cgi
+import cgi, db
 
 app=Flask(__name__)
 app.secret_key = 'insert_clever_secret_here'
+
+@app.route('/register',methods=['GET','POST'])
+def register():
+    if request.method=='GET':
+        return render_template('register.html')
+    else:
+        username = cgi.escape(request.form['username'],quote=True)
+        pw = cgi.escape(request.form['pw'],quote=True)
+        if db.addUser(username,pw):
+            ## flash success
+            return redirect('/login')
+        else:
+            ## flash failure
+            return redirect('/register')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -11,16 +25,17 @@ def login():
     else:
         user=cgi.escape(request.form['user'],quote=True)
         pw=cgi.escape(request.form['pass'],quote=True)
-        if True: ## validate user
+        if db.validateLogin(user,pw):
             session['user']=user
             if 'return_to' in session:
                 s = session['return_to']
                 session.pop('return_to',None)
                 return redirect(s)
             else:
-                return redirect('/home') ## redirect to default home page
+                return redirect('/home')
         else:
-            pass ## invalid submission
+            ## flash invalid submission
+            return redirect('/login')
 
 @app.route('/logout')
 def logout():
@@ -31,9 +46,13 @@ def logout():
 def home():
     return render_template('home.html')
 
-@app.route('/trip/<tripName>')
+@app.route('/trips/<tripName>')
 def trip(tripName):
     return render_template('trip.html',tripName=tripName)
+
+@app.route('/trips')
+def trips():
+    return render_template('trips.html',trips=db.getTrips(session['user']))
     
 @app.route('/addTrip',methods=['GET','POST'])
 def addTrip():
@@ -41,7 +60,9 @@ def addTrip():
         return render_template('addTrip.html')
     else:
         tripName = cgi.escape(request.form['tripName'],quote=True)
-        return redirect('trip/'+tripName)
+        user = session['user']
+        db.addTrip(tripName,user)
+        return redirect('trips/'+tripName)
     
 if __name__ == '__main__':
     app.debug=True
