@@ -31,6 +31,12 @@ body{
     text-align: center;
 }
 /* END MENU STYLING */
+input[type="text"]{
+    border-radius: 5px;
+    border: none;
+    height: 20px;
+    font-size: 1.0em;
+}
 .map-canvas{
     height: 50%;
     width: 50%;

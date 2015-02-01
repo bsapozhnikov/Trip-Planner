@@ -4,6 +4,8 @@
 	<title>Trips</title>
     </head>
     <body>
+	{% include 'menu.html' %}
+	<a href="/addTrip">New Trip</a>
 	{% for trip in trips%}
 	<div class="trip">
 	    <a href="/trips/{{trip|safe}}"> {{trip|safe}} </a>

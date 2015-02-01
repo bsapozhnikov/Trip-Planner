@@ -27,7 +27,8 @@
 		     $('#leavingLng').val(lng);
 		     initialize('leavingMapCanvas',lat,lng);
 		 });
-	     })
+	     });
+	     $("#mapLeavingAddress").trigger('click');
 	     $("#arrivalMethod").change(function(){
 		 var select = $(this).val();
 		 //var str = "arrivalMethod"+select+".html";
