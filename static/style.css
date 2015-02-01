@@ -31,3 +31,9 @@ body{
     text-align: center;
 }
 /* END MENU STYLING */
+.map-canvas{
+    height: 50%;
+    width: 50%;
+    margin: 0;
+    padding: 0;
+}

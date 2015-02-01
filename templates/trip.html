@@ -2,8 +2,30 @@
     <head>
 	<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWPZcD2dgi1T0F_dNC1SThe64a-rfdkgY"></script>
 	<script type="text/javascript">
+	 function initialize(mapID,latitude,longitude) {
+	     var mapOptions = {
+		 center: {lat: latitude, lng: longitude},
+		 zoom: 15
+	     };
+	     var map = new google.maps.Map(document.getElementById(mapID),
+					   mapOptions);
+	 }
 	 $(document).ready(function() {
+	     $("#mapLeavingAddress").click(function(){
+		 var addr = $("#leavingAddress").val().replace(' ','+') || 'white+house';//DEFAULT FOR TESTING PURPOSES
+		 var url = "https://maps.googleapis.com/maps/api/geocode/json?address="+addr+"&key=AIzaSyBWPZcD2dgi1T0F_dNC1SThe64a-rfdkgY";
+		 $.getJSON(url, function(data){
+		     data = data.results[0];
+		     fullAddr = data.formatted_address;
+		     lat = data.geometry.location.lat;
+		     lng = data.geometry.location.lng;
+		     console.log(fullAddr);
+		     console.log('('+lat+','+lng+')');
+		     initialize('leavingMapCanvas',lat,lng);
+		 });
+	     })
 	     $("#arrivalMethod").change(function(){
 		 var select = $(this).val();
 		 //var str = "arrivalMethod"+select+".html";
@@ -16,7 +38,8 @@
 		 }
 		 
 	     })
-	 })
+	 });
+
 	</script>
     </head>
     <body>
@@ -24,6 +47,13 @@
 	{{tripName|safe}}
 	<div id="arrival">
 	    Getting There
+	    <form method="post" id="leavingLocation">
+		From
+		<input type="text" name="leavingAddress" id="leavingAddress">
+		<button type="button" id="mapLeavingAddress">Map</button><br>
+		<div class="map-canvas" id="leavingMapCanvas"></div>
+		<input type="submit" name="leavingLocation" value="Submit">
+	    </form>
 	    <form method="post">
 		<select name="arrivalMethod" id="arrivalMethod">
 		    <option id="arrivalMethodBlank" value="--">--</option>

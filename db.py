@@ -27,7 +27,7 @@ def dropTables():
 def createTables():
     '(re)creates tables for users and trips'
     createTable('users', [('username','text'),('pw','text')])
-    createTable('trips', [('name','text'),('user','text')])
+    createTable('trips', [('name','text'),('user','text'),('pathID','integer')])
 
 ### USER MANAGER STUFF ###
 def getUsers():
@@ -76,13 +76,13 @@ def addUser(username,pw):
 ### TRIP MANAGER STUFF ###
 def getTrips(username):
     '''returns all of user's trips as a dictionary
-    the key is the placename
-    the value is a dictionary containing threst of the data (nothing)'''
+    the key is the oid
+    the value is a dictionary containing threst of the data (placename)'''
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
     trips = {}
-    for row in c.execute("SELECT * FROM trips WHERE user=?",(username,)):
-        content = {}
+    for row in c.execute("SELECT oid,* FROM trips WHERE user=?",(username,)):
+        content = {'placename':row[1]}
         trips[row[0]]=content
     return trips
     
@@ -91,6 +91,6 @@ def addTrip(tripName,username):
     ## DOES NOT CHECK IF NAME ALREADY EXISTS
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
-    c.execute("INSERT INTO trips VALUES(?,?)",(tripName,username))
+    c.execute("INSERT INTO trips VALUES(?,?,'')",(tripName,username))
     conn.commit()
     print "added %s's trip %s"%(username,tripName)

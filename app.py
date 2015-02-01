@@ -46,9 +46,13 @@ def logout():
 def home():
     return render_template('home.html')
 
-@app.route('/trips/<tripName>')
+@app.route('/trips/<tripName>',methods=['GET','POST'])
 def trip(tripName):
-    return render_template('trip.html',tripName=tripName)
+    if request.method=='GET':
+        return render_template('trip.html',tripName=tripName)
+    else:
+        if 'leavingLocation' in request.form:
+            
 
 @app.route('/trips')
 def trips():
