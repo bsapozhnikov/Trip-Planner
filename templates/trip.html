@@ -23,6 +23,8 @@
 		     lng = data.geometry.location.lng;
 		     console.log(fullAddr);
 		     console.log('('+lat+','+lng+')');
+		     $('#leavingLat').val(lat);
+		     $('#leavingLng').val(lng);
 		     initialize('leavingMapCanvas',lat,lng);
 		 });
 	     })
@@ -45,6 +47,11 @@
     <body>
 	{% include 'menu.html' %}
 	{{tripName|safe}}
+	<br>
+	{% for node in nodes %}
+	{{node}}
+	<br>
+	{% endfor %}
 	<div id="arrival">
 	    Getting There
 	    <form method="post" id="leavingLocation">
@@ -52,6 +59,7 @@
 		<input type="text" name="leavingAddress" id="leavingAddress">
 		<button type="button" id="mapLeavingAddress">Map</button><br>
 		<div class="map-canvas" id="leavingMapCanvas"></div>
+		<input type="text" name="leavingLat" id="leavingLat"><input type="text" name="leavingLng" id="leavingLng">
 		<input type="submit" name="leavingLocation" value="Submit">
 	    </form>
 	    <form method="post">

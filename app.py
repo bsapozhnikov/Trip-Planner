@@ -46,13 +46,25 @@ def logout():
 def home():
     return render_template('home.html')
 
-@app.route('/trips/<tripName>',methods=['GET','POST'])
-def trip(tripName):
+@app.route('/trips/<tripID>',methods=['GET','POST'])
+def trip(tripID):
     if request.method=='GET':
-        return render_template('trip.html',tripName=tripName)
+        tripName = db.getTrip(tripID)['tripName']
+        nodes = db.getNodesByNodeID(tripID)
+        nodesL=[nodes[k] for k in sorted(nodes)]
+        return render_template('trip.html',tripName=tripName,nodes=nodesL)
     else:
         if 'leavingLocation' in request.form:
-            
+            lat = request.form['leavingLat']
+            lng = request.form['leavingLng']
+            nodes = db.getNodesByNodeID(tripID)
+            if len(nodes)<1 or not (nodes[0]['nodeName'] == 'leaving'):
+                db.addNode(tripID,nodeName='leaving',lat=lat,lng=lng)
+            else:
+                db.updateNodeLocation(nodes[0]['oid'],lat,lng)
+            return redirect('trips/'+tripID)
+        else:
+            return 'NOT DONE YET'
 
 @app.route('/trips')
 def trips():

@@ -23,11 +23,13 @@ def createTable(tablename,attr):
 def dropTables():
     dropTable('users')
     dropTable('trips')
+    dropTable('nodes')
 
 def createTables():
     '(re)creates tables for users and trips'
     createTable('users', [('username','text'),('pw','text')])
-    createTable('trips', [('name','text'),('user','text'),('pathID','integer')])
+    createTable('trips', [('name','text'),('user','text'),('numNodes','integer')])
+    createTable('nodes', [('nodeID','integer'),('tripID','integer'),('nodeName','text'),('lat','text'),('lng','text')])
 
 ### USER MANAGER STUFF ###
 def getUsers():
@@ -74,6 +76,23 @@ def addUser(username,pw):
         return True
         
 ### TRIP MANAGER STUFF ###
+def getTrip(tripID):
+    'returns trip with given oid as a dictionary'
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    for row in c.execute("SELECT oid,* FROM trips WHERE oid=?",(tripID,)):
+        content = {'tripName':row[1],'username':row[2],'numNodes':row[3]}
+        return content
+
+def getTripByUser(username,tripName):
+    '''returns trip with given user and name as a dictionary
+    also includes the oid'''
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    for row in c.execute("SELECT oid,* FROM trips WHERE user=? AND name=?",(username,tripName)):
+        content = {'oid':row[0],'tripName':row[1],'username':row[2],'numNodes':row[3]}
+        return content
+    
 def getTrips(username):
     '''returns all of user's trips as a dictionary
     the key is the oid
@@ -82,7 +101,7 @@ def getTrips(username):
     c = conn.cursor()
     trips = {}
     for row in c.execute("SELECT oid,* FROM trips WHERE user=?",(username,)):
-        content = {'placename':row[1]}
+        content = {'tripName':row[1],'username':row[2],'numNodes':row[3]}
         trips[row[0]]=content
     return trips
     
@@ -91,6 +110,65 @@ def addTrip(tripName,username):
     ## DOES NOT CHECK IF NAME ALREADY EXISTS
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
-    c.execute("INSERT INTO trips VALUES(?,?,'')",(tripName,username))
+    c.execute("INSERT INTO trips VALUES(?,?,0)",(tripName,username))
     conn.commit()
     print "added %s's trip %s"%(username,tripName)
+
+def incTripNumNodes(tripID):
+    'increments the numNodes variable in trip with given oid'
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute("UPDATE trips SET numNodes = numNodes + 1 WHERE oid=?",(tripID,))
+    conn.commit()
+    print "Trip %i has one more node"%int(tripID)
+
+def decTripNumNodes(tripID):
+    'decrements the numNodes variable in trip with given oid'
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute("UPDATE trips SET numNodes = numNodes - 1 WHERE oid=?",(tripID,))
+    conn.commit()
+    print "Trip %i has one less node"%tripID
+
+def getNodesByOID(tripID):
+    '''returns all of trip's nodes as a dictionary
+    the key is the node's oid
+    the value is a dictionary containing the rest of the data (nodeID, tripID, lat, lng)'''
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    nodes = {}
+    for row in c.execute("SELECT oid,* FROM nodes WHERE tripID=?",(tripID,)):
+        content = {'nodeID':row[1],'tripID':row[2],'nodeName':row[3],'lat':row[4],'lng':row[5]}
+        nodes[row[0]]=content
+    return nodes
+
+def getNodesByNodeID(tripID):
+    '''returns all of trip's nodes as a dictionary
+    the key is the node's nodeID
+    the value is a dictionary containing the rest of the data (oid, tripID, lat, lng)'''
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    nodes = {}
+    for row in c.execute("SELECT oid,* FROM nodes WHERE tripID=?",(tripID,)):
+        content = {'oid':row[0],'tripID':row[2],'nodeName':row[3],'lat':row[4],'lng':row[5]}
+        nodes[row[1]]=content
+    return nodes    
+        
+def addNode(tripID,nodeName='',lat='',lng=''):
+    'adds node to given trip'
+    nodeID = getTrip(tripID)['numNodes']
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO nodes VALUES(?,?,?,?,?)",(nodeID,tripID,nodeName,lat,lng))
+    conn.commit()
+    incTripNumNodes(tripID)
+    print "Added Node %i to Trip %i"%(nodeID,tripID)
+
+def updateNodeLocation(oid,lat,lng):
+    'updates the lat and lng values for the node with the given oid'
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute("UPDATE nodes SET lat = ? WHERE oid=?",(lat,oid))
+    c.execute("UPDATE nodes SET lng = ? WHERE oid=?",(lng,oid))
+    conn.commit()
+    print "Set Node's location to (%d,%d)"%(float(lat),float(lng))
