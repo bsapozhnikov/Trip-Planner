@@ -7,6 +7,7 @@ body{
 
 /* HORIZONTAL MENU ACROSS THE TOP */
 #menu{
+    display: block;
     list-style-type: none;
     margin: 0px;
     padding: 0px;
@@ -18,24 +19,31 @@ body{
 }
 #menu li{
     display: inline;
+    height: 100%;
     float: left;
+    background-color: #bbb;
+    padding: 1% 0;
 }
 #menu li:hover{
-    background-color: #bbb;
+    background-color: #aaf;
 }
-#menu li a{
+#menu li a, #menu li a:visited{
     text-decoration: none;
     display: block;
     min-width: 60px;
     width: auto;
+    height: 100%;
     text-align: center;
+    color: #000;
 }
 /* END MENU STYLING */
-input[type="text"]{
+input[type="text"], input[type="text"]:focus{
     border-radius: 5px;
     border: none;
     height: 20px;
     font-size: 1.0em;
+    outline: none;
+    box-shadow: none;
 }
 .map-canvas{
     height: 50%;

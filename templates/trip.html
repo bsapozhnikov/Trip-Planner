@@ -13,6 +13,14 @@
 					   mapOptions);
 	 }
 	 $(document).ready(function() {
+	     $("#arrivalToggle").click(function(){
+		 $("#arrival").toggle('fast');
+		 $("#leavingLocation").hide('fast');
+	     });
+	     $("#arrival").hide();
+	     $("#leavingLocationToggle").click(function(){
+		 $("#leavingLocation").toggle('fast');
+	     });
 	     $("#mapLeavingAddress").click(function(){
 		 var addr = $("#leavingAddress").val().replace(' ','+') || 'white+house';//DEFAULT FOR TESTING PURPOSES
 		 var url = "https://maps.googleapis.com/maps/api/geocode/json?address="+addr+"&key=AIzaSyBWPZcD2dgi1T0F_dNC1SThe64a-rfdkgY";
@@ -53,25 +61,27 @@
 	{{node}}
 	<br>
 	{% endfor %}
-	<div id="arrival">
-	    Getting There
-	    <form method="post" id="leavingLocation">
-		From
-		<input type="text" name="leavingAddress" id="leavingAddress">
-		<button type="button" id="mapLeavingAddress">Map</button><br>
-		<div class="map-canvas" id="leavingMapCanvas"></div>
-		<input type="text" name="leavingLat" id="leavingLat"><input type="text" name="leavingLng" id="leavingLng">
-		<input type="submit" name="leavingLocation" value="Submit">
-	    </form>
-	    <form method="post">
-		<select name="arrivalMethod" id="arrivalMethod">
-		    <option id="arrivalMethodBlank" value="--">--</option>
-		    <option id="arrivalMethodDriving" value="driving">Driving</option>
-		    <option id="arrivalMethodOther" value="other">Other</option>
-		</select>
-		<div id="arrivalMethodForm">
-		</div>
-	    </form>
+	<div id="arrivalWrapper">
+	    <div id="arrivalToggle">Getting There</div>
+	    <div id="arrival">
+		<div id="leavingLocationToggle">From</div>
+		<form method="post" id="leavingLocation">
+		    <input type="text" name="leavingAddress" id="leavingAddress">
+		    <button type="button" id="mapLeavingAddress">Map</button><br>
+		    <div class="map-canvas" id="leavingMapCanvas"></div>
+		    <input type="text" name="leavingLat" id="leavingLat"><input type="text" name="leavingLng" id="leavingLng">
+		    <input type="submit" name="leavingLocation" value="Submit">
+		</form>
+		<form method="post">
+		    <select name="arrivalMethod" id="arrivalMethod">
+			<option id="arrivalMethodBlank" value="--">--</option>
+			<option id="arrivalMethodDriving" value="driving">Driving</option>
+			<option id="arrivalMethodOther" value="other">Other</option>
+		    </select>
+		    <div id="arrivalMethodForm">
+		    </div>
+		</form>
+	    </div>
 	</div>
     </body>
 </html>
