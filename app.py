@@ -4,6 +4,13 @@ import cgi, db
 app=Flask(__name__)
 app.secret_key = 'insert_clever_secret_here'
 
+@app.route('/')
+def root():
+    if 'user' in session:
+        return redirect('/home')
+    else:
+        return redirect('/login')
+
 @app.route('/register',methods=['GET','POST'])
 def register():
     if request.method=='GET':
@@ -58,10 +65,20 @@ def trip(tripID):
             lat = request.form['leavingLat']
             lng = request.form['leavingLng']
             nodes = db.getNodesByNodeID(tripID)
-            if len(nodes)<1 or not (nodes[0]['nodeName'] == 'leaving'):
-                db.addNode(tripID,nodeName='leaving',lat=lat,lng=lng)
+            if (0 not in nodes) or not (nodes[0]['nodeName'] == 'leaving'):
+                db.addNode(nodeID=0,tripID=tripID,nodeName='leaving',lat=lat,lng=lng)
             else:
                 db.updateNodeLocation(nodes[0]['oid'],lat,lng)
+            return redirect('trips/'+tripID)
+        elif 'destLocation' in request.form:
+            ## ONLY WORKS IF LEAVINGLOCATION ALREADY IN DATABASE
+            lat = request.form['destLat']
+            lng = request.form['destLng']
+            nodes = db.getNodesByNodeID(tripID)
+            if (1 not in nodes) or not (nodes[1]['nodeName'] == 'dest'):
+                db.addNode(nodeID=1,tripID=tripID,nodeName='dest',lat=lat,lng=lng)
+            else:
+                db.updateNodeLocation(nodes[1]['oid'],lat,lng)
             return redirect('trips/'+tripID)
         else:
             return 'NOT DONE YET'
@@ -78,7 +95,8 @@ def addTrip():
         tripName = cgi.escape(request.form['tripName'],quote=True)
         user = session['user']
         db.addTrip(tripName,user)
-        return redirect('trips/'+tripName)
+        tripID = db.getTripByUser(user,tripName)['oid']
+        return redirect('trips/'+`tripID`)
     
 if __name__ == '__main__':
     app.debug=True

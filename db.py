@@ -154,15 +154,16 @@ def getNodesByNodeID(tripID):
         nodes[row[1]]=content
     return nodes    
         
-def addNode(tripID,nodeName='',lat='',lng=''):
+def addNode(nodeID=None,tripID=1,nodeName='',lat='',lng=''):
     'adds node to given trip'
-    nodeID = getTrip(tripID)['numNodes']
+    if nodeID == None:
+        nodeID = getTrip(tripID)['numNodes']
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
     c.execute("INSERT INTO nodes VALUES(?,?,?,?,?)",(nodeID,tripID,nodeName,lat,lng))
     conn.commit()
     incTripNumNodes(tripID)
-    print "Added Node %i to Trip %i"%(nodeID,tripID)
+    print "Added Node %i to Trip %i"%(nodeID,int(tripID))
 
 def updateNodeLocation(oid,lat,lng):
     'updates the lat and lng values for the node with the given oid'
