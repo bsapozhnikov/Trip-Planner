@@ -106,14 +106,14 @@
 	 var nodeInfo = document.getElementById("nodeInfo");
 	 svg.setAttribute('width',500);
 	 svg.setAttribute('height',500);
-	 var dx = 250.0/{{nodes|length}};
-	 var x = dx;
+	 var dy = 250.0/{{nodes|length}};
+	 var y = dy;
 	 //console.log("nodes length: "+{{nodes|length}});
 	 var i = 0;
 	 {% for node in nodes %}
 	 var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
-	 c.setAttribute('cx',x);
-	 c.setAttribute('cy',200);
+	 c.setAttribute('cx',250);
+	 c.setAttribute('cy',y);
 	 c.setAttribute('r',10);
 	 //c.setAttribute('nodeID',i);
 	 c.addEventListener("click",function(){
@@ -122,7 +122,7 @@
 	     nodeInfo.innerHTML = "{{node}}";
 	 });
 	 svg.appendChild(c);
-	 x+=2*dx;
+	 y+=2*dy;
 	 //i++;
 	 {% endfor %}
 	</script>
